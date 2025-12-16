@@ -1,0 +1,117 @@
+name: Build and Test Docker Images
+
+# Trigger on push to main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Docker Buildx (for better caching)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Build Backend Docker image
+      - name: Build Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          load: true
+          tags: todo-backend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Step 4: Build Frontend Docker image
+      - name: Build Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+          load: true
+          tags: todo-frontend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Step 5: Start containers with Docker Compose
+      - name: Start containers
+        run: |
+          docker compose up -d
+          echo "Waiting for services to be healthy..."
+          sleep 10
+
+      # Step 6: Check if containers are running
+      - name: Check container status
+        run: |
+          echo "=== Container Status ==="
+          docker compose ps
+
+          echo ""
+          echo "=== Backend Logs ==="
+          docker compose logs backend
+
+          echo ""
+          echo "=== Frontend Logs ==="
+          docker compose logs frontend
+
+      # Step 7: Test Backend Health
+      - name: Test Backend Health
+        run: |
+          echo "Testing backend health endpoint..."
+          curl -f http://localhost:5001/health || exit 1
+          echo ""
+          echo "✅ Backend health check passed!"
+
+      # Step 8: Test Backend API
+      - name: Test Backend API
+        run: |
+          echo "Testing GET /todos..."
+          curl -f http://localhost:5001/todos || exit 1
+          echo ""
+
+          echo "Testing POST /todos..."
+          curl -f -X POST http://localhost:5001/todos \
+            -H "Content-Type: application/json" \
+            -d '{"text": "Test from GitHub Actions"}' || exit 1
+          echo ""
+
+          echo "✅ Backend API tests passed!"
+
+      # Step 9: Test Frontend is accessible
+      - name: Test Frontend
+        run: |
+          echo "Testing frontend accessibility..."
+          curl -f http://localhost:3000/ || exit 1
+          echo ""
+          echo "✅ Frontend is accessible!"
+
+      # Step 10: Stop containers
+      - name: Stop containers
+        if: always()
+        run: docker compose down
+
+      # Step 11: Print success message
+      - name: Success
+        run: |
+          echo "============================================="
+          echo "🎉 All builds and tests completed successfully!"
+          echo "============================================="
+          echo ""
+          echo "✅ Backend Docker image built"
+          echo "✅ Frontend Docker image built"
+          echo "✅ Docker Compose orchestration works"
+          echo "✅ Backend API responds correctly"
+          echo "✅ Frontend is accessible"
