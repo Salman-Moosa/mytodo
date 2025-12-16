@@ -300,50 +300,136 @@
         box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
       }
 
-      .reminder-input {
-        padding: 16px 12px;
-        font-family: "JetBrains Mono", monospace;
-        font-size: 12px;
-        border: 2px solid var(--ink);
-        border-right: none;
-        border-left: none;
+      .reminder-wrapper {
+        display: flex;
+        align-items: center;
         background: var(--paper);
-        color: var(--ink);
+        border: 2px solid var(--ink);
+        border-left: none;
+        border-right: none;
+        padding: 0 8px;
+        gap: 6px;
         transition: all 0.2s;
+        position: relative;
+      }
+
+      .reminder-wrapper:focus-within {
+        background: var(--paper-bright);
+      }
+
+      .reminder-wrapper.has-value {
+        background: var(--coral-glow);
+        border-color: var(--coral);
+      }
+
+      .reminder-icon {
+        font-size: 16px;
         cursor: pointer;
+        opacity: 0.6;
+        transition: all 0.2s;
+        user-select: none;
+      }
+
+      .reminder-wrapper:hover .reminder-icon,
+      .reminder-wrapper.has-value .reminder-icon {
+        opacity: 1;
+      }
+
+      .reminder-input {
+        padding: 16px 4px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        border: none;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        width: 0;
+        opacity: 0;
+        transition: all 0.2s;
+      }
+
+      .reminder-wrapper.has-value .reminder-input {
+        width: auto;
+        opacity: 1;
       }
 
       .reminder-input:focus {
         outline: none;
-        background: var(--paper-bright);
       }
 
       .reminder-input::-webkit-calendar-picker-indicator {
+        display: none;
+      }
+
+      .reminder-preview {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--coral-dark);
+        white-space: nowrap;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .reminder-clear {
+        background: var(--coral);
+        color: var(--paper);
+        border: none;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
         cursor: pointer;
-        filter: invert(0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        flex-shrink: 0;
+      }
+
+      .reminder-clear:hover {
+        background: var(--coral-dark);
+        transform: scale(1.1);
       }
 
       .reminder-badge {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        background: var(--gold);
+        gap: 5px;
+        background: linear-gradient(135deg, var(--gold), #d4a824);
         color: var(--paper);
-        font-size: 9px;
+        font-size: 10px;
         font-weight: 700;
         letter-spacing: 0.5px;
-        padding: 3px 8px;
-        border-radius: 3px;
-        margin-left: 8px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        margin-left: 10px;
+        box-shadow: 0 2px 6px rgba(201, 162, 39, 0.3);
+        transition: all 0.2s;
+      }
+
+      .reminder-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(201, 162, 39, 0.4);
       }
 
       .reminder-badge.past {
-        background: var(--coral);
+        background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+        box-shadow: 0 2px 6px rgba(232, 93, 76, 0.3);
+        text-decoration: line-through;
+        opacity: 0.8;
       }
 
       .reminder-badge.soon {
-        background: var(--sage);
+        background: linear-gradient(135deg, var(--sage), var(--sage-light));
+        box-shadow: 0 2px 6px rgba(74, 103, 65, 0.3);
         animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      .reminder-badge.soon::before {
+        content: "🔔";
+        margin-right: 2px;
       }
 
       .add-btn {
@@ -773,12 +859,30 @@
           autocomplete="off"
           maxlength="200"
         />
-        <input
-          type="datetime-local"
-          id="reminderInput"
-          class="reminder-input"
-          title="Set reminder time (optional)"
-        />
+        <div class="reminder-wrapper" id="reminderWrapper">
+          <span
+            class="reminder-icon"
+            onclick="document.getElementById('reminderInput').showPicker()"
+            >⏰</span
+          >
+          <input
+            type="datetime-local"
+            id="reminderInput"
+            class="reminder-input"
+            title="Set reminder time (optional)"
+            onchange="updateReminderPreview()"
+          />
+          <span class="reminder-preview" id="reminderPreview"></span>
+          <button
+            type="button"
+            class="reminder-clear"
+            id="reminderClear"
+            onclick="clearReminder()"
+            style="display: none"
+          >
+            ✕
+          </button>
+        </div>
         <button type="submit" class="add-btn" id="addBtn">
           <span>File</span>
         </button>
@@ -815,6 +919,37 @@
       let completedTodos = new Set(
         JSON.parse(localStorage.getItem("completedTodos") || "[]")
       );
+
+      // Reminder input preview functions
+      function updateReminderPreview() {
+        const input = document.getElementById("reminderInput");
+        const preview = document.getElementById("reminderPreview");
+        const clearBtn = document.getElementById("reminderClear");
+        const wrapper = document.getElementById("reminderWrapper");
+
+        if (input.value) {
+          const date = new Date(input.value);
+          const options = {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          };
+          preview.textContent = date.toLocaleDateString("en-US", options);
+          clearBtn.style.display = "flex";
+          wrapper.classList.add("has-value");
+        } else {
+          preview.textContent = "";
+          clearBtn.style.display = "none";
+          wrapper.classList.remove("has-value");
+        }
+      }
+
+      function clearReminder() {
+        const input = document.getElementById("reminderInput");
+        input.value = "";
+        updateReminderPreview();
+      }
 
       // Set the date display
       function setDateDisplay() {
