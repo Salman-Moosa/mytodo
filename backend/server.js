@@ -15,12 +15,14 @@ let todos = [
     text: "Learn Something",
     completed: false,
     createdAt: new Date().toISOString(),
+    reminderTime: null,
   },
   {
     id: 2,
     text: "Buy apple",
     completed: false,
     createdAt: new Date().toISOString(),
+    reminderTime: null,
   },
 ];
 
@@ -38,7 +40,7 @@ app.get("/todos", (req, res) => {
 
 // POST /todos - Add a new todo
 app.post("/todos", (req, res) => {
-  const { text } = req.body;
+  const { text, reminderTime } = req.body;
 
   if (!text || text.trim() === "") {
     return res.status(400).json({ error: "Todo text is required" });
@@ -49,6 +51,7 @@ app.post("/todos", (req, res) => {
     text: text.trim(),
     completed: false,
     createdAt: new Date().toISOString(),
+    reminderTime: reminderTime || null,
   };
 
   todos.push(newTodo);
