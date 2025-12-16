@@ -1,46 +1,76 @@
-# 📝 Simple Todo App
-
-A simple Todo application to learn **Docker Compose** and **GitHub Actions** with separate backend and frontend services.
-
-## 🏗️ Project Structure
+<div align="center">
 
 ```
-TODO/
-├── backend/
-│   ├── Dockerfile          # Backend Docker image
-│   ├── package.json        # Node.js dependencies
-│   ├── server.js           # Express API server
-│   └── test.js             # Backend tests
-├── frontend/
-│   ├── Dockerfile          # Frontend Docker image
-│   ├── index.html          # Todo app UI
-│   ├── nginx.conf          # Nginx configuration
-│   ├── package.json        # Frontend dependencies
-│   └── test.js             # Frontend tests
-├── .github/
-│   └── workflows/
-│       └── docker-build.yml  # GitHub Actions workflow
-├── docker-compose.yml      # Docker Compose configuration
-└── README.md               # This file
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║    ████████╗██╗  ██╗███████╗    ██████╗  █████╗ ██╗██╗  ██╗   ██╗║
+║    ╚══██╔══╝██║  ██║██╔════╝    ██╔══██╗██╔══██╗██║██║  ╚██╗ ██╔╝║
+║       ██║   ███████║█████╗      ██║  ██║███████║██║██║   ╚████╔╝ ║
+║       ██║   ██╔══██║██╔══╝      ██║  ██║██╔══██║██║██║    ╚██╔╝  ║
+║       ██║   ██║  ██║███████╗    ██████╔╝██║  ██║██║███████╗██║   ║
+║       ╚═╝   ╚═╝  ╚═╝╚══════╝    ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚═╝   ║
+║                                                                  ║
+║                         ████████╗ ██████╗ ██████╗  ██████╗       ║
+║                         ╚══██╔══╝██╔═══██╗██╔══██╗██╔═══██╗      ║
+║                            ██║   ██║   ██║██║  ██║██║   ██║      ║
+║                            ██║   ██║   ██║██║  ██║██║   ██║      ║
+║                            ██║   ╚██████╔╝██████╔╝╚██████╔╝      ║
+║                            ╚═╝    ╚═════╝ ╚═════╝  ╚═════╝       ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
 ```
 
-## 🚀 Quick Start
+### _A Vintage Editorial-Inspired Task Management Experience_
 
-### Option 1: Run with Docker Compose (Recommended)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/features/actions)
+
+</div>
+
+---
+
+## ◈ About
+
+**The Daily Todo** is a beautifully crafted task management application inspired by vintage newspaper aesthetics. Built as a learning project for **Docker Compose** and **GitHub Actions**, it features a sophisticated editorial design with elegant typography, smooth animations, and a light/dark theme toggle.
+
+> _"Your tasks, delivered fresh daily — with the elegance of yesterday's print."_
+
+---
+
+## ◈ Features
+
+| Feature                  | Description                                                        |
+| :----------------------- | :----------------------------------------------------------------- |
+| 📰 **Editorial Design**  | Newspaper-inspired UI with Playfair Display & JetBrains Mono fonts |
+| 🌓 **Theme Toggle**      | Seamless light/dark mode switching                                 |
+| ⏰ **Reminder System**   | Set time-based reminders for your todos                            |
+| ✨ **Smooth Animations** | Delightful micro-interactions and transitions                      |
+| 🐳 **Containerized**     | Full Docker & Docker Compose support                               |
+| 🔄 **CI/CD Ready**       | GitHub Actions workflow included                                   |
+
+---
+
+## ◈ Quick Start
+
+### Using Docker Compose _(Recommended)_
 
 ```bash
-# Start all services
-docker-compose up --build
+# Clone and navigate to project
+git clone https://github.com/Salman-Moosa/mytodo.git
+cd mytodo
 
-# Or run in detached mode
-docker-compose up -d --build
+# Launch all services
+docker-compose up --build
 ```
 
-Then open http://localhost:3000 in your browser.
+> 🌐 Open **http://localhost:3000** in your browser
 
-### Option 2: Run Locally (Without Docker)
+### Running Locally
 
-**Backend:**
+<details>
+<summary><b>Backend</b> — Express.js API Server</summary>
 
 ```bash
 cd backend
@@ -48,9 +78,12 @@ npm install
 npm start
 ```
 
-Backend runs on http://localhost:5000
+API available at `http://localhost:5000`
 
-**Frontend:**
+</details>
+
+<details>
+<summary><b>Frontend</b> — Vanilla JS + Nginx</summary>
 
 ```bash
 cd frontend
@@ -58,110 +91,184 @@ npm install
 npm start
 ```
 
-Frontend runs on http://localhost:3000
+UI available at `http://localhost:3000`
 
-## 📡 API Endpoints
+</details>
 
-| Method | Endpoint     | Description       |
-| ------ | ------------ | ----------------- |
-| GET    | `/todos`     | Get all todos     |
-| POST   | `/todos`     | Create a new todo |
-| DELETE | `/todos/:id` | Delete a todo     |
-| GET    | `/health`    | Health check      |
+---
 
-### Example API Usage
+## ◈ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         THE DAILY TODO                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌─────────────┐         ┌─────────────┐         ┌──────────┐  │
+│   │             │   API   │             │  Serve  │          │  │
+│   │   BROWSER   │ ◄─────► │   BACKEND   │ ◄─────► │  NGINX   │  │
+│   │             │  :5000  │  (Express)  │  :3000  │          │  │
+│   └─────────────┘         └─────────────┘         └──────────┘  │
+│                                  │                      │       │
+│                                  │                      │       │
+│                           ┌──────▼──────────────────────▼──┐    │
+│                           │        DOCKER NETWORK          │    │
+│                           │         (todo-network)         │    │
+│                           └────────────────────────────────┘    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## ◈ API Reference
+
+|  Method  | Endpoint     | Description                           |
+| :------: | :----------- | :------------------------------------ |
+|  `GET`   | `/todos`     | Retrieve all todos (sorted by latest) |
+|  `POST`  | `/todos`     | Create a new todo                     |
+| `PATCH`  | `/todos/:id` | Toggle completion status              |
+| `DELETE` | `/todos/:id` | Delete a todo                         |
+|  `GET`   | `/health`    | Health check endpoint                 |
+
+### Example Requests
 
 ```bash
-# Get all todos
+# Fetch all todos
 curl http://localhost:5000/todos
 
-# Add a new todo
+# Create a new todo
 curl -X POST http://localhost:5000/todos \
   -H "Content-Type: application/json" \
-  -d '{"text": "Learn Docker"}'
+  -d '{"text": "Read the morning paper", "reminderTime": "09:00"}'
+
+# Mark as complete
+curl -X PATCH http://localhost:5000/todos/1
 
 # Delete a todo
 curl -X DELETE http://localhost:5000/todos/1
 ```
 
-## 🐳 Docker Details
+---
 
-### Build Images Individually
+## ◈ Project Structure
+
+```
+mytodo/
+├── backend/
+│   ├── Dockerfile          # Node.js container config
+│   ├── package.json        # Dependencies & scripts
+│   ├── server.js           # Express API server
+│   └── test.js             # API tests
+│
+├── frontend/
+│   ├── Dockerfile          # Nginx container config
+│   ├── index.html          # Editorial-styled Todo UI
+│   ├── nginx.conf          # Reverse proxy config
+│   ├── package.json        # Frontend dependencies
+│   └── test.js             # UI tests
+│
+├── .github/
+│   └── workflows/
+│       └── docker-build.yml  # CI/CD pipeline
+│
+├── docker-compose.yml      # Multi-container orchestration
+└── README.md               # You are here
+```
+
+---
+
+## ◈ Docker Commands
+
+| Command                                      | Action                       |
+| :------------------------------------------- | :--------------------------- |
+| `docker-compose up --build`                  | Build and start all services |
+| `docker-compose up -d`                       | Start in detached mode       |
+| `docker-compose logs -f`                     | Stream container logs        |
+| `docker-compose ps`                          | List running containers      |
+| `docker-compose down`                        | Stop and remove containers   |
+| `docker-compose up --build --force-recreate` | Full rebuild                 |
+
+### Building Images Individually
 
 ```bash
-# Build backend
+# Backend
 docker build -t todo-backend ./backend
 
-# Build frontend
+# Frontend
 docker build -t todo-frontend ./frontend
 ```
 
-### Run Containers Individually
+---
 
-```bash
-# Create network
-docker network create todo-network
+## ◈ CI/CD Pipeline
 
-# Run backend
-docker run -d --name todo-backend --network todo-network -p 5000:5000 todo-backend
+The GitHub Actions workflow (`.github/workflows/docker-build.yml`) executes on every push to `main`:
 
-# Run frontend
-docker run -d --name todo-frontend --network todo-network -p 3000:3000 todo-frontend
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      CI/CD PIPELINE                          │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│   [1] Build Backend Image                                    │
+│         │                                                    │
+│         ▼                                                    │
+│   [2] Build Frontend Image                                   │
+│         │                                                    │
+│         ▼                                                    │
+│   [3] Start Docker Compose                                   │
+│         │                                                    │
+│         ├────► [4] Test Backend Health                       │
+│         │                                                    │
+│         ├────► [5] Test API Endpoints                        │
+│         │                                                    │
+│         ├────► [6] Test Frontend Access                      │
+│         │                                                    │
+│         ▼                                                    │
+│   [7] Cleanup Containers                                     │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-### Useful Docker Commands
+---
+
+## ◈ Running Tests
 
 ```bash
-# View running containers
-docker-compose ps
+# Backend tests (requires running server)
+cd backend && npm test
 
-# View logs
-docker-compose logs -f
-
-# Stop all containers
-docker-compose down
-
-# Rebuild and restart
-docker-compose up --build --force-recreate
+# Frontend tests
+cd frontend && npm test
 ```
 
-## 🔄 GitHub Actions
+---
 
-The workflow (`.github/workflows/docker-build.yml`) runs on every push to `main` and:
+## ◈ Tech Stack
 
-1. ✅ Builds the Backend Docker image
-2. ✅ Builds the Frontend Docker image
-3. ✅ Starts containers with Docker Compose
-4. ✅ Tests Backend health endpoint
-5. ✅ Tests Backend API (GET and POST)
-6. ✅ Tests Frontend accessibility
-7. ✅ Cleans up containers
+<div align="center">
 
-### To Enable GitHub Actions
+|     Layer      | Technology                        |
+| :------------: | :-------------------------------- |
+|  **Frontend**  | HTML5 • CSS3 • Vanilla JavaScript |
+|  **Backend**   | Node.js • Express.js • CORS       |
+|   **Fonts**    | Playfair Display • JetBrains Mono |
+|   **Server**   | Nginx (containerized)             |
+| **Containers** | Docker • Docker Compose           |
+|   **CI/CD**    | GitHub Actions                    |
 
-1. Push this repository to GitHub
-2. Go to your repository → Actions tab
-3. The workflow will run automatically on push to `main`
+</div>
 
-## 🧪 Running Tests
+---
 
-```bash
-# Test backend (requires backend to be running)
-cd backend
-npm test
+<div align="center">
 
-# Test frontend
-cd frontend
-npm test
+```
+═══════════════════════════════════════════════════════════════
+                    Crafted with ♥ for learning
+═══════════════════════════════════════════════════════════════
 ```
 
+**[⬆ Back to Top](#-about)**
 
-## 🛠️ Technologies Used
-
-- **Backend**: Node.js, Express, CORS
-- **Frontend**: Vanilla HTML, CSS, JavaScript
-- **Server**: Nginx (for frontend in Docker)
-- **Containerization**: Docker, Docker Compose
-- **CI/CD**: GitHub Actions
-
-
+</div>
