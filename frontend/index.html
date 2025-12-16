@@ -300,6 +300,52 @@
         box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
       }
 
+      .reminder-input {
+        padding: 16px 12px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        border: 2px solid var(--ink);
+        border-right: none;
+        border-left: none;
+        background: var(--paper);
+        color: var(--ink);
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .reminder-input:focus {
+        outline: none;
+        background: var(--paper-bright);
+      }
+
+      .reminder-input::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        filter: invert(0.3);
+      }
+
+      .reminder-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--gold);
+        color: var(--paper);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 3px 8px;
+        border-radius: 3px;
+        margin-left: 8px;
+      }
+
+      .reminder-badge.past {
+        background: var(--coral);
+      }
+
+      .reminder-badge.soon {
+        background: var(--sage);
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
       .add-btn {
         padding: 16px 28px;
         font-family: "JetBrains Mono", monospace;
@@ -727,6 +773,12 @@
           autocomplete="off"
           maxlength="200"
         />
+        <input
+          type="datetime-local"
+          id="reminderInput"
+          class="reminder-input"
+          title="Set reminder time (optional)"
+        />
         <button type="submit" class="add-btn" id="addBtn">
           <span>File</span>
         </button>
@@ -839,6 +891,32 @@
         return date.toLocaleDateString("en-US", options);
       }
 
+      // Format reminder time for display
+      function formatReminderTime(dateString) {
+        if (!dateString) return null;
+        const date = new Date(dateString);
+        const options = {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        return date.toLocaleDateString("en-US", options);
+      }
+
+      // Get reminder badge class based on time
+      function getReminderBadgeClass(reminderTime) {
+        if (!reminderTime) return "";
+        const now = new Date();
+        const reminder = new Date(reminderTime);
+        const diffMs = reminder - now;
+        const diffMins = diffMs / (1000 * 60);
+
+        if (diffMs < 0) return "past";
+        if (diffMins <= 30) return "soon";
+        return "";
+      }
+
       // Render todos to the DOM
       function renderTodos(todosToRender) {
         const todoList = document.getElementById("todoList");
@@ -856,12 +934,17 @@
         todoList.innerHTML = todosToRender
           .map((todo, index) => {
             const isCompleted = completedTodos.has(todo.id);
+            const reminderBadge = todo.reminderTime
+              ? `<span class="reminder-badge ${getReminderBadgeClass(
+                  todo.reminderTime
+                )}">⏰ ${formatReminderTime(todo.reminderTime)}</span>`
+              : "";
             return `
               <div class="todo-item${
                 isCompleted ? " completed" : ""
-              }" data-id="${todo.id}" style="animation-delay: ${
-              0.05 + index * 0.05
-            }s">
+              }" data-id="${todo.id}" data-reminder="${
+              todo.reminderTime || ""
+            }" style="animation-delay: ${0.05 + index * 0.05}s">
                 <div class="todo-checkbox${
                   isCompleted ? " checked" : ""
                 }" onclick="toggleComplete(${
@@ -872,7 +955,9 @@
                   </svg>
                 </div>
                 <div class="todo-content">
-                  <span class="todo-text">${escapeHtml(todo.text)}</span>
+                  <span class="todo-text">${escapeHtml(
+                    todo.text
+                  )}${reminderBadge}</span>
                   <span class="todo-meta">Filed ${formatDate(
                     todo.createdAt
                   )}</span>
@@ -909,8 +994,12 @@
         event.preventDefault();
 
         const input = document.getElementById("todoInput");
+        const reminderInput = document.getElementById("reminderInput");
         const btn = document.getElementById("addBtn");
         const text = input.value.trim();
+        const reminderTime = reminderInput.value
+          ? new Date(reminderInput.value).toISOString()
+          : null;
 
         if (!text) {
           input.style.animation = "shake 0.4s ease";
@@ -924,13 +1013,18 @@
           const response = await fetch(`${API_URL}/todos`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text, reminderTime }),
           });
 
           if (!response.ok) throw new Error("Failed to add");
 
           input.value = "";
-          showToast("Task filed successfully");
+          reminderInput.value = "";
+          showToast(
+            reminderTime
+              ? "Task filed with reminder ⏰"
+              : "Task filed successfully"
+          );
           fetchTodos();
         } catch (error) {
           console.error("Error adding todo:", error);
@@ -1012,7 +1106,65 @@
         }
       });
 
+      // Reminder notification system
+      let notifiedReminders = new Set(
+        JSON.parse(localStorage.getItem("notifiedReminders") || "[]")
+      );
+
+      // Request notification permission
+      function requestNotificationPermission() {
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
+      }
+
+      // Check for due reminders
+      function checkReminders() {
+        const now = new Date();
+        todos.forEach((todo) => {
+          if (
+            todo.reminderTime &&
+            !completedTodos.has(todo.id) &&
+            !notifiedReminders.has(todo.id)
+          ) {
+            const reminderDate = new Date(todo.reminderTime);
+            const diffMs = reminderDate - now;
+
+            // Notify if reminder is due (within 1 minute window)
+            if (diffMs <= 60000 && diffMs > -60000) {
+              showReminderNotification(todo);
+              notifiedReminders.add(todo.id);
+              localStorage.setItem(
+                "notifiedReminders",
+                JSON.stringify([...notifiedReminders])
+              );
+            }
+          }
+        });
+        // Re-render to update badge styles
+        renderTodos(todos);
+      }
+
+      // Show reminder notification
+      function showReminderNotification(todo) {
+        // Show toast
+        showToast(`⏰ Reminder: ${todo.text}`);
+
+        // Show browser notification if permitted
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("TODO Reminder", {
+            body: todo.text,
+            icon: "📋",
+            tag: `reminder-${todo.id}`,
+          });
+        }
+      }
+
+      // Check reminders every 30 seconds
+      setInterval(checkReminders, 30000);
+
       // Initial load
+      requestNotificationPermission();
       fetchTodos();
     </script>
   </body>
