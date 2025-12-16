@@ -148,23 +148,7 @@
         position: relative;
       }
 
-      body::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 1px;
-        height: 100%;
-        background: linear-gradient(
-          to bottom,
-          transparent,
-          var(--rule),
-          transparent
-        );
-        opacity: 0.6;
-        pointer-events: none;
-      }
+      /* Middle line removed for cleaner UI */
 
       .container {
         max-width: 620px;
@@ -417,17 +401,14 @@
         display: flex;
         align-items: center;
         padding: 14px 0;
-        border-bottom: 1px solid var(--rule);
-      }
-      .todo-item:not(:last-child) {
-        border-bottom: 1px solid var(--rule);
-      }
-      .todo-item:last-child {
-        border-bottom: none;
         transition: all 0.25s ease;
         animation: fadeSlideIn 0.4s ease-out backwards;
         position: relative;
         gap: 12px;
+      }
+
+      .todo-item:not(:last-child) {
+        border-bottom: 1px solid var(--rule);
       }
 
       .todo-item.removing {
