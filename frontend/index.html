@@ -12,19 +12,21 @@
     />
     <style>
       :root {
-        --ink: #1a1a1a;
-        --ink-light: #3a3a3a;
-        --paper: #f5f0e8;
-        --paper-bright: #fffdf9;
-        --paper-dark: #e8e0d0;
+        /* Dark book theme */
+        --ink: #e8e4dc;
+        --ink-light: #b8b4ac;
+        --paper: #1a1915;
+        --paper-bright: #252420;
+        --paper-dark: #121210;
         --coral: #e85d4c;
         --coral-dark: #c94a3a;
         --coral-glow: rgba(232, 93, 76, 0.15);
-        --sage: #4a6741;
-        --sage-light: #5a7a51;
-        --muted: #8b8680;
-        --rule: #c9c3b8;
-        --gold: #c9a227;
+        --sage: #6b9960;
+        --sage-light: #7fb572;
+        --muted: #6b675f;
+        --rule: #3a3630;
+        --gold: #d4a824;
+        --accent: #8b7355;
       }
 
       @keyframes fadeSlideIn {
@@ -140,8 +142,13 @@
       body {
         font-family: "JetBrains Mono", monospace;
         background: var(--paper);
-        /* Reduced background lines for less clutter */
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        /* Dark leather book texture */
+        background-image: radial-gradient(
+            ellipse at 50% 0%,
+            rgba(139, 115, 85, 0.08) 0%,
+            transparent 50%
+          ),
+          url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
         min-height: 100vh;
         padding: 40px 20px;
         color: var(--ink);
@@ -323,16 +330,26 @@
       }
 
       .reminder-icon {
-        font-size: 16px;
         cursor: pointer;
         opacity: 0.6;
         transition: all 0.2s;
         user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .reminder-wrapper:hover .reminder-icon,
-      .reminder-wrapper.has-value .reminder-icon {
-        opacity: 1;
+      .reminder-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 1.5;
+      }
+
+      .reminder-wrapper:hover .reminder-icon svg,
+      .reminder-wrapper.has-value .reminder-icon svg {
+        stroke: var(--gold);
       }
 
       .reminder-input {
@@ -427,9 +444,73 @@
         animation: pulse 1.5s ease-in-out infinite;
       }
 
-      .reminder-badge.soon::before {
-        content: "🔔";
-        margin-right: 2px;
+      /* Pin button styles */
+      .pin-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 4px;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .pin-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--muted);
+        fill: none;
+        stroke-width: 2;
+        transition: all 0.15s;
+      }
+
+      .pin-btn:hover svg {
+        stroke: var(--gold);
+      }
+
+      .pin-btn.pinned svg {
+        stroke: var(--gold);
+        fill: var(--gold);
+      }
+
+      .todo-item.pinned {
+        background: rgba(212, 168, 36, 0.08);
+        border-left: 3px solid var(--gold);
+        padding-left: 12px;
+        margin-left: -15px;
+      }
+
+      /* Improved delete button */
+      .delete-btn {
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 6px;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .delete-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--muted);
+        fill: none;
+        stroke-width: 2;
+        transition: all 0.15s;
+      }
+
+      .delete-btn:hover {
+        background: var(--coral);
+        border-color: var(--coral);
+      }
+
+      .delete-btn:hover svg {
+        stroke: var(--paper);
       }
 
       .add-btn {
@@ -623,41 +704,13 @@
 
       .todo-actions {
         display: flex;
-        gap: 8px;
+        gap: 4px;
         opacity: 0;
         transition: opacity 0.2s;
       }
 
       .todo-item:hover .todo-actions {
         opacity: 1;
-      }
-
-      .delete-btn {
-        padding: 6px 12px;
-        font-family: "JetBrains Mono", monospace;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        background: var(--coral);
-        color: var(--paper);
-        border: 1px solid var(--coral);
-        opacity: 0.95;
-        box-shadow: 0 2px 8px rgba(232, 93, 76, 0.08);
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-
-      .delete-btn:hover {
-        background: var(--coral-dark);
-        color: var(--paper);
-        border-color: var(--coral-dark);
-        opacity: 1;
-        transform: scale(1.07);
-      }
-
-      .delete-btn:active {
-        transform: scale(0.98);
       }
 
       .empty-state {
@@ -863,8 +916,10 @@
           <span
             class="reminder-icon"
             onclick="document.getElementById('reminderInput').showPicker()"
-            >⏰</span
-          >
+            ><svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 3" /></svg
+          ></span>
           <input
             type="datetime-local"
             id="reminderInput"
@@ -880,7 +935,14 @@
             onclick="clearReminder()"
             style="display: none"
           >
-            ✕
+            <svg viewBox="0 0 24 24" width="10" height="10">
+              <path
+                d="M18 6L6 18M6 6l12 12"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
           </button>
         </div>
         <button type="submit" class="add-btn" id="addBtn">
@@ -900,10 +962,7 @@
       </div>
 
       <footer class="footer">
-        <p class="footer-text">
-          Published continuously since you opened this tab
-        </p>
-        <span class="edition-badge">Digital Edition</span>
+        <p class="footer-text">Published by Salman</p>
       </footer>
     </div>
 
@@ -918,6 +977,9 @@
       let todos = [];
       let completedTodos = new Set(
         JSON.parse(localStorage.getItem("completedTodos") || "[]")
+      );
+      let pinnedTodos = new Set(
+        JSON.parse(localStorage.getItem("pinnedTodos") || "[]")
       );
 
       // Reminder input preview functions
@@ -1078,25 +1140,38 @@
         if (todosToRender.length === 0) {
           todoList.innerHTML = `
             <div class="empty-state">
-              <span class="empty-state-icon">☐</span>
+              <svg class="empty-state-icon" viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" fill="none" stroke-width="1">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
               <span class="empty-state-text">No items on today's agenda</span>
               <span class="empty-state-hint">Type above and press Enter to add one</span>
             </div>`;
           return;
         }
 
-        todoList.innerHTML = todosToRender
+        // Sort: pinned first, then by date
+        const sortedTodos = [...todosToRender].sort((a, b) => {
+          const aPinned = pinnedTodos.has(a.id);
+          const bPinned = pinnedTodos.has(b.id);
+          if (aPinned && !bPinned) return -1;
+          if (!aPinned && bPinned) return 1;
+          return 0;
+        });
+
+        todoList.innerHTML = sortedTodos
           .map((todo, index) => {
             const isCompleted = completedTodos.has(todo.id);
+            const isPinned = pinnedTodos.has(todo.id);
             const reminderBadge = todo.reminderTime
               ? `<span class="reminder-badge ${getReminderBadgeClass(
                   todo.reminderTime
-                )}">⏰ ${formatReminderTime(todo.reminderTime)}</span>`
+                )}">${formatReminderTime(todo.reminderTime)}</span>`
               : "";
             return `
-              <div class="todo-item${
-                isCompleted ? " completed" : ""
-              }" data-id="${todo.id}" data-reminder="${
+              <div class="todo-item${isCompleted ? " completed" : ""}${
+              isPinned ? " pinned" : ""
+            }" data-id="${todo.id}" data-reminder="${
               todo.reminderTime || ""
             }" style="animation-delay: ${0.05 + index * 0.05}s">
                 <div class="todo-checkbox${
@@ -1117,14 +1192,36 @@
                   )}</span>
                 </div>
                 <div class="todo-actions">
+                  <button class="pin-btn${
+                    isPinned ? " pinned" : ""
+                  }" onclick="togglePin(${todo.id})" aria-label="${
+              isPinned ? "Unpin" : "Pin"
+            } task">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L12 12M12 12L7 17M12 12L17 17M5 22H19" stroke-linecap="round"/></svg>
+                  </button>
                   <button class="delete-btn" onclick="deleteTodo(${
                     todo.id
-                  })" aria-label="Delete task">Remove</button>
+                  })" aria-label="Delete task">
+                    <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" stroke-linecap="round"/></svg>
+                  </button>
                 </div>
               </div>
             `;
           })
           .join("");
+      }
+
+      // Toggle pin (local only)
+      function togglePin(id) {
+        if (pinnedTodos.has(id)) {
+          pinnedTodos.delete(id);
+          showToast("Task unpinned");
+        } else {
+          pinnedTodos.add(id);
+          showToast("Task pinned");
+        }
+        localStorage.setItem("pinnedTodos", JSON.stringify([...pinnedTodos]));
+        renderTodos(todos);
       }
 
       // Toggle todo completion (local only)
