@@ -1,13 +1,13 @@
 name: Build and Test Docker Images
 
-# Trigger on push to main branch
+# Trigger on push to master branch
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-test:
