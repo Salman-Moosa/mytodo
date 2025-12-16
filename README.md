@@ -155,14 +155,6 @@ cd frontend
 npm test
 ```
 
-## 📚 What You'll Learn
-
-- **Docker**: Containerizing Node.js and static file applications
-- **Dockerfile**: Writing multi-stage builds and health checks
-- **Docker Compose**: Orchestrating multiple services
-- **Networking**: Container-to-container communication
-- **GitHub Actions**: CI/CD pipeline for Docker builds
-- **API Development**: Simple REST API with Express
 
 ## 🛠️ Technologies Used
 
@@ -172,6 +164,4 @@ npm test
 - **Containerization**: Docker, Docker Compose
 - **CI/CD**: GitHub Actions
 
-## 📝 License
 
-MIT - Feel free to use this for learning!
