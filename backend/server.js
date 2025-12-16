@@ -10,16 +10,30 @@ app.use(express.json());
 
 // In-memory storage for todos
 let todos = [
-  { id: 1, text: "Learn Something", completed: false },
-  { id: 2, text: "Buy apple", completed: false }
+  {
+    id: 1,
+    text: "Learn Something",
+    completed: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    text: "Buy apple",
+    completed: false,
+    createdAt: new Date().toISOString(),
+  },
 ];
 
 let nextId = 4;
 
-// GET /todos - Get all todos
+// GET /todos - Get all todos (sorted by latest first)
 app.get("/todos", (req, res) => {
   console.log("GET /todos - Returning", todos.length, "todos");
-  res.json(todos);
+  // Sort by createdAt descending (latest first)
+  const sortedTodos = [...todos].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+  res.json(sortedTodos);
 });
 
 // POST /todos - Add a new todo
@@ -34,6 +48,7 @@ app.post("/todos", (req, res) => {
     id: nextId++,
     text: text.trim(),
     completed: false,
+    createdAt: new Date().toISOString(),
   };
 
   todos.push(newTodo);
