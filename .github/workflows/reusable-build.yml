@@ -35,4 +35,4 @@ jobs:
         with:
           context: ${{ inputs.context_path }}
           push: true
-          tags: ${{ secrets.docker_username }}/todo:${{ inputs.service_name }}-latest
+          tags: ${{ secrets.docker_username }}/todoapp:${{ inputs.service_name }}-latest
