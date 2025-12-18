@@ -30,4 +30,5 @@ jobs:
     needs: [build-backend, build-frontend]
     if: always()
     steps:
+      - uses: actions/checkout@v4
       - run: docker compose down
