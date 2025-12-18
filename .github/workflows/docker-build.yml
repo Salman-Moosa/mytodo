@@ -7,24 +7,35 @@ on:
     branches: [master]
 
 jobs:
-  build-and-test:
+  build-backend:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      service_name: backend
+      context_path: ./backend
+    secrets:
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
+      docker_password: ${{ secrets.DOCKER_PASSWORD }}
+
+  build-frontend:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      service_name: frontend
+      context_path: ./frontend
+    secrets:
+      docker_username: ${{ secrets.DOCKER_USERNAME }}
+      docker_password: ${{ secrets.DOCKER_PASSWORD }}
+
+  integration-tests:
+    needs: [build-backend, build-frontend]
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build and start containers
-        run: |
-          docker compose up -d --build
-          sleep 10
-
-      - name: Test services
-        run: |
-          curl -f http://localhost:5001/health
-          curl -f http://localhost:5001/todos
-          curl -f http://localhost:3000/
-
-      - name: Cleanup
-        if: always()
+      - uses: actions/checkout@v4
+      
+      - run: docker compose up -d --build && sleep 10
+      
+      - run: curl -f http://localhost:5001/health
+      - run: curl -f http://localhost:5001/todos
+      - run: curl -f http://localhost:3000/
+      
+      - if: always()
         run: docker compose down
